@@ -54,7 +54,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({
 export const useAuthStore = () => {
   const ctx = useContext(AuthContext)
   if (!ctx) {
-    throw new Error('useAuthStore must be used within AuthProvider')
+    throw new Error('useAuthStore must be used within AuthProvider error')
   }
   return ctx
 }

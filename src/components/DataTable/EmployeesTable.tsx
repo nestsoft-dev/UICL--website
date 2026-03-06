@@ -3,7 +3,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type ColumnVisibilityState,
+  type VisibilityState,
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
@@ -42,7 +42,7 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
   })
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] =
-    useState<ColumnVisibilityState>({})
+    useState<VisibilityState>({})
   const [selectedEmployee, setSelectedEmployee] =
     useState<EmployeeRecord | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -63,13 +63,13 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
   )
 
   useEffect(() => {
-    const visibility: ColumnVisibilityState = {}
+    const visibility: VisibilityState = {}
     if (role && role !== 'HR_ADMIN') {
       sensitiveColumnIds.forEach((id) => {
         visibility[id] = false
       })
     }
-    setColumnVisibility((prev) => ({ ...visibility, ...prev }))
+    setColumnVisibility((prev: VisibilityState) => ({ ...visibility, ...prev }))
   }, [role])
 
   const filterData = useMemo(() => {
@@ -158,7 +158,7 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
       `employees_${new Date().toISOString().slice(0, 10)}.csv`,
       filterData,
       visibleColumns.map((col) => ({
-        header: String(col.header ?? ''),
+        header: String(col.columnDef.header ?? ''),
         accessor: (row) => {
           const accessorKey = (col as { accessorKey?: keyof EmployeeRecord })
             .accessorKey
