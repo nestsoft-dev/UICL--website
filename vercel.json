@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://uicl-server.onrender.com/api/:path*"
+    }
+  ]
+}

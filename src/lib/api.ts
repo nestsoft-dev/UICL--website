@@ -6,13 +6,11 @@ import { authStorage } from './auth'
 // the environment variable is expected to supply the full URL (including
 // http:// or https://) but we also fall back to a sensible default for local
 // development.
-const baseURL =
-  import.meta.env.VITE_API_URL ??
-  // In production, fall back to the deployed backend if env var is missing.
-  (import.meta.env.PROD ? 'https://uicl-server.onrender.com' :
-  // default for local development: use Vite dev proxy to avoid CORS.
-  // The proxy in vite.config.ts forwards /api/* → https://uicl-server.onrender.com/api/*
-  '')
+// Leave baseURL empty so all /api/* requests are relative to the current origin.
+// - In local dev:  Vite's proxy (vite.config.ts) forwards them to the backend.
+// - In production: vercel.json rewrites forward them to the backend server-side,
+//   avoiding any CORS issues.
+const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 export const api = axios.create({
   baseURL,
