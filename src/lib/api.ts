@@ -34,6 +34,7 @@ export interface SubmissionData {
   firstName: string
   middleName?: string
   dateOfBirth: string | Date
+  gender: string
   maritalStatus: string
   religion: string
   nationality?: string

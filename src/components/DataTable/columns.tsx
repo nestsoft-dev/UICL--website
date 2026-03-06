@@ -111,7 +111,7 @@ export const buildColumns = (
   { header: 'Permanent Address', accessorKey: 'permanentAddress' },
   { header: 'Email Address+M1', accessorKey: 'emailAddressM1' },
   { header: 'Phone Number Staff', accessorKey: 'phoneNumberStaff' },
-  { header: 'Profession', accessorKey: 'profession' },
+  { header: 'Designation', accessorKey: 'profession' },
   { header: 'Employment Date', accessorKey: 'employmentDate' },
   { header: 'Hobbies', accessorKey: 'hobbies' },
   { header: 'Next of Kin Full Name', accessorKey: 'nextOfKinFullName' },

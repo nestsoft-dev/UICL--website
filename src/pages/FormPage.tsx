@@ -11,7 +11,7 @@ import TextInput from '../components/fields/TextInput'
 import SelectInput from '../components/fields/SelectInput'
 import Textarea from '../components/fields/Textarea'
 import FileInput, { type FileValue } from '../components/fields/FileInput'
-import { nigerianStates } from '../constants/nigerianStates'
+import { nigerianStates, siteLocations } from '../constants/nigerianStates'
 import { createSubmission, type SubmissionData } from '../lib/api'
 import { useAuthStore } from '../store/useAuthStore'
 
@@ -62,6 +62,7 @@ const formSchema = z
     firstName: requiredText,
     middleName: optionalText,
     dateOfBirth: requiredText,
+    gender: requiredText,
     maritalStatus: requiredText,
     religion: requiredText,
     nationality: requiredText,
@@ -121,6 +122,7 @@ type FormValues = z.infer<typeof formSchema>
 
 const titleOptions = ['Mr', 'Mrs', 'Miss', 'Dr', 'Engr', 'Prof', 'Others']
 const maritalOptions = ['Single', 'Married', 'Divorced', 'Widowed']
+const genderOptions = ['Male', 'Female']
 const religionOptions = ['Christianity', 'Islam', 'Traditional', 'Others']
 const professionOptions = [
   'AC TECHNICIAN',
@@ -135,15 +137,16 @@ const professionOptions = [
   'Supervisor',
   'Technician',
 ]
-const hiringOptions = ['New hire', 'Existing staff', 'Contract', 'Intern']
+const hiringOptions = ['Active', 'Terminated']
 
 const defaultValues: FormValues = {
-  preferredState: 'Bayelsa',
+  preferredState: '',
   title: '',
   surnameLastName: '',
   firstName: '',
   middleName: '',
   dateOfBirth: '',
+  gender: '',
   maritalStatus: '',
   religion: '',
   nationality: 'Nigeria',
@@ -169,7 +172,7 @@ const defaultValues: FormValues = {
   emergencyPhoneNumber: '',
   emergencyEmailAddress: '',
   siteAndLocation: '',
-  hiringStatus: 'New hire',
+  hiringStatus: 'Active',
   nameOfFinancialInstitution: '',
   accountName: '',
   accountNumber: '',
@@ -311,6 +314,7 @@ export default function FormPage() {
         firstName: values.firstName,
         middleName: values.middleName,
         dateOfBirth: values.dateOfBirth,
+        gender: values.gender,
         maritalStatus: values.maritalStatus,
         religion: values.religion,
         nationality: values.nationality,
@@ -398,7 +402,7 @@ export default function FormPage() {
         <HeaderCard
           preferredState={preferredState}
           onStateChange={handleStateChange}
-          states={nigerianStates}
+          states={siteLocations}
           error={errors.preferredState?.message}
         />
 
@@ -474,6 +478,22 @@ export default function FormPage() {
                 htmlFor="dateOfBirth"
               >
                 <TextInput id="dateOfBirth" type="date" {...register('dateOfBirth')} />
+              </FormField>
+
+              <FormField
+                label="Gender"
+                required
+                error={errors.gender?.message}
+                htmlFor="gender"
+              >
+                <SelectInput id="gender" {...register('gender')}>
+                  <option value="">Select</option>
+                  {genderOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </SelectInput>
               </FormField>
 
               <FormField
@@ -578,7 +598,7 @@ export default function FormPage() {
               </FormField>
 
               <FormField
-                label="Profession"
+                label="Designation"
                 required
                 error={errors.profession?.message}
               >
@@ -611,7 +631,7 @@ export default function FormPage() {
 
                       {professionSelectValue === 'Other' && (
                         <TextInput
-                          placeholder="Specify Profession"
+                          placeholder="Specify Designation"
                           value={professionCustomValue}
                           onChange={(event) => {
                             setProfessionCustomValue(event.target.value)

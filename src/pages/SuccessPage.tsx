@@ -116,7 +116,7 @@ export default function SuccessPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-slate-500">
-                Profession
+                Designation
               </p>
               <p className="mt-1 font-semibold text-slate-900">
                 {submission?.data.profession || '—'}

@@ -1,8 +1,19 @@
-import { useMemo, useState, type FC } from 'react'
+import { useEffect, useMemo, useState, type FC } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '../lib/api'
+
+type RecentUser = {
+  _id: string
+  email: string
+  fullName: string
+  role: string
+  siteId?: string
+  isActive: boolean
+  lastLoginAt: string | null
+  createdAt: string
+}
 const roleOptions = ['HR_ADMIN', 'SITE_SUPERVISOR', 'DATA_ENTRY', 'VIEWER'] as const
 
 const schema = z
@@ -33,16 +44,30 @@ const schema = z
 
 type RegisterValues = z.infer<typeof schema>
 
-const mockRecentUsers = [
-  { name: 'Amina Yusuf', role: 'SITE_SUPERVISOR', email: 'amina@company.com' },
-  { name: 'Chinedu Okafor', role: 'DATA_ENTRY', email: 'chinedu@company.com' },
-  { name: 'Lara Bamidele', role: 'VIEWER', email: 'lara@company.com' },
-]
-
 const StaffRegisterPage: FC = () => {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([])
+  const [recentLoading, setRecentLoading] = useState(false)
+  const [recentError, setRecentError] = useState<string | null>(null)
+
+  const fetchRecentUsers = async () => {
+    setRecentLoading(true)
+    setRecentError(null)
+    try {
+      const res = await api.get('/api/auth/users/recent')
+      setRecentUsers(res.data?.data ?? [])
+    } catch {
+      setRecentError('Failed to load recent users.')
+    } finally {
+      setRecentLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchRecentUsers()
+  }, [])
 
   const {
     register,
@@ -75,6 +100,7 @@ const StaffRegisterPage: FC = () => {
       })
       setSuccess('Staff account created successfully.')
       reset()
+      fetchRecentUsers()
     } catch (err: any) {
       setError(
         err?.response?.data?.message ??
@@ -217,25 +243,69 @@ const StaffRegisterPage: FC = () => {
       </div>
 
       <div className="rounded-2xl border border-white/60 bg-white/80 p-6 shadow-sm">
-        <div className="mb-4 text-sm font-semibold text-slate-700">
-          Recently created users
+        <div className="mb-4 flex items-center justify-between">
+          <div className="text-sm font-semibold text-slate-700">Recently created users</div>
+          <button
+            type="button"
+            onClick={fetchRecentUsers}
+            disabled={recentLoading}
+            className="text-xs text-emerald-600 hover:underline disabled:opacity-50"
+          >
+            {recentLoading ? 'Refreshing…' : 'Refresh'}
+          </button>
         </div>
-        <div className="space-y-3 text-sm text-slate-600">
-          {mockRecentUsers.map((user) => (
-            <div
-              key={user.email}
-              className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3"
-            >
-              <div>
-                <div className="font-medium text-slate-700">{user.name}</div>
-                <div className="text-xs text-slate-400">{user.email}</div>
+
+        {recentError && (
+          <p className="mb-3 text-xs text-rose-500">{recentError}</p>
+        )}
+
+        {recentLoading && !recentUsers.length ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-100" />
+            ))}
+          </div>
+        ) : recentUsers.length === 0 ? (
+          <p className="text-xs text-slate-400">No users found.</p>
+        ) : (
+          <div className="space-y-3 text-sm text-slate-600">
+            {recentUsers.map((user) => (
+              <div
+                key={user._id}
+                className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-slate-700">{user.fullName}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        user.isActive
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                          : 'bg-slate-100 text-slate-400 border border-slate-200'
+                      }`}
+                    >
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                  <div className="mt-0.5 text-xs text-slate-400">{user.email}</div>
+                  <div className="mt-0.5 text-xs text-slate-400">
+                    {user.lastLoginAt
+                      ? `Last login: ${new Date(user.lastLoginAt).toLocaleDateString()}`
+                      : 'Never logged in'}
+                  </div>
+                </div>
+                <div className="ml-4 flex flex-col items-end gap-1">
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-500">
+                    {user.role.replace(/_/g, ' ')}
+                  </span>
+                  {user.siteId && (
+                    <span className="text-xs text-slate-400">{user.siteId}</span>
+                  )}
+                </div>
               </div>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-500">
-                {user.role.replace('_', ' ')}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -34,7 +34,7 @@ const AppLayout: FC = () => {
         <aside className="hidden w-64 flex-col border-r border-white/40 bg-white/80 px-6 py-8 shadow-sm backdrop-blur lg:flex">
           <div className="mb-10">
             <div className="text-lg font-semibold tracking-wide text-emerald-700">
-              UICL Bio-Data
+              Linkup Bio-Data
             </div>
             <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
               HR Admin Suite

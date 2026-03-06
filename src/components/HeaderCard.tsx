@@ -23,7 +23,7 @@ export default function HeaderCard({
               LinkUp Human Capital Limited
             </p>
             <h1 className="mt-1 text-2xl font-semibold text-slate-900 md:text-3xl">
-              {preferredState || 'Bayelsa'} BIO-DATA FORM
+              {preferredState || 'LinkUp'} BIO-DATA FORM
             </h1>
             <p className="mt-1 text-xs text-slate-500">
               Complete this form to onboard as staff.
@@ -33,7 +33,7 @@ export default function HeaderCard({
 
         <div className="w-full md:w-56">
           <label className="text-sm font-medium text-slate-700">
-            State Selector
+            Site/Location
             <span className="ml-1 text-rose-500" title="Required">
               *
             </span>

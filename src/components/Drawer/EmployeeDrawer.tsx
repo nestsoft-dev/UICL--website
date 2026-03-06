@@ -201,7 +201,7 @@ const EmployeeDrawer: FC<DrawerProps> = ({
             <Section
               title="Employment"
               items={[
-                { label: 'Profession', value: employee.profession },
+                { label: 'Designation', value: employee.profession },
                 { label: 'Employment Date', value: employee.employmentDate },
                 { label: 'Site & Location', value: employee.siteAndLocation },
                 { label: 'Hiring Status', value: employee.hiringStatus },
