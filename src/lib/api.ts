@@ -190,3 +190,62 @@ export const updateSubmission = async (
 export const deleteSubmission = async (id: string): Promise<void> => {
   await api.delete(`/api/submissions/${id}`)
 }
+
+export type SubmissionStatus = 'ACTIVE' | 'REJECTED' | 'PENDING'
+
+export const updateSubmissionStatus = async (
+  referenceCode: string,
+  status: SubmissionStatus,
+  rejectedReason?: string,
+): Promise<{ success: boolean; data: Submission }> => {
+  const body: { status: SubmissionStatus; rejectedReason?: string } = { status }
+  if (status === 'REJECTED' && rejectedReason) body.rejectedReason = rejectedReason
+  const response = await api.patch(`/api/submissions/${referenceCode}`, body)
+  return response.data
+}
+
+export interface EditSubmissionData {
+  firstName?: string
+  surnameLastName?: string
+  middleName?: string
+  gender?: string
+  dateOfBirth?: string
+  maritalStatus?: string
+  religion?: string
+  phoneNumberStaff?: string
+  emailAddress?: string
+  profession?: string
+  permanentAddress?: string
+  nokFullName?: string
+  nokPhoneNumber?: string
+  guarantorFullName?: string
+  guarantorPhoneNumber?: string
+  passportPicture?: File | null
+  signature?: File | null
+}
+
+export const editSubmission = async (
+  referenceCode: string,
+  data: EditSubmissionData,
+): Promise<{ success: boolean; data: Submission }> => {
+  const formData = new FormData()
+  if (data.firstName) formData.append('firstName', data.firstName)
+  if (data.surnameLastName) formData.append('surnameLastName', data.surnameLastName)
+  if (data.middleName) formData.append('middleName', data.middleName)
+  if (data.gender) formData.append('gender', data.gender)
+  if (data.dateOfBirth) formData.append('dateOfBirth', data.dateOfBirth)
+  if (data.maritalStatus) formData.append('maritalStatus', data.maritalStatus)
+  if (data.religion) formData.append('religion', data.religion)
+  if (data.phoneNumberStaff) formData.append('phoneNumberStaff', data.phoneNumberStaff)
+  if (data.emailAddress) formData.append('emailAddress', data.emailAddress)
+  if (data.profession) formData.append('profession', data.profession)
+  if (data.permanentAddress) formData.append('permanentAddress', data.permanentAddress)
+  if (data.nokFullName) formData.append('nokFullName', data.nokFullName)
+  if (data.nokPhoneNumber) formData.append('nokPhoneNumber', data.nokPhoneNumber)
+  if (data.guarantorFullName) formData.append('guarantorFullName', data.guarantorFullName)
+  if (data.guarantorPhoneNumber) formData.append('guarantorPhoneNumber', data.guarantorPhoneNumber)
+  if (data.passportPicture) formData.append('passportPicture', data.passportPicture)
+  if (data.signature) formData.append('signature', data.signature)
+  const response = await api.patch(`/api/submissions/${referenceCode}/edit`, formData)
+  return response.data
+}

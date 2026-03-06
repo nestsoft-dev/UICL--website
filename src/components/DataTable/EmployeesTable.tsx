@@ -305,6 +305,7 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
         sensitive={sensitiveData}
         role={role}
         onPreviewFile={handlePreview}
+        onEditSuccess={onRefresh}
       />
 
       {preview ? (
