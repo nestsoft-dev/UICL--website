@@ -69,7 +69,7 @@ const LoginPage: FC = () => {
       <div className="mx-auto flex w-full max-w-5xl overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-2xl backdrop-blur">
         <div className="hidden w-1/2 flex-col justify-between bg-gradient-to-br from-emerald-600 via-emerald-500 to-sky-500 p-10 text-white lg:flex">
           <div>
-            <div className="text-xl font-semibold tracking-wide">UICL Bio-Data</div>
+            <div className="text-xl font-semibold tracking-wide">LinkUp Bio-Data</div>
             <p className="mt-3 text-sm text-emerald-50/80">
               Secure HR administration, streamlined staff onboarding, and premium
               employee data oversight.
