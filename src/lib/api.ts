@@ -8,9 +8,11 @@ import { authStorage } from './auth'
 // development.
 const baseURL =
   import.meta.env.VITE_API_URL ??
+  // In production, fall back to the deployed backend if env var is missing.
+  (import.meta.env.PROD ? 'https://uicl-server.onrender.com' :
   // default for local development: use Vite dev proxy to avoid CORS.
   // The proxy in vite.config.ts forwards /api/* → https://uicl-server.onrender.com/api/*
-  ''
+  '')
 
 export const api = axios.create({
   baseURL,
