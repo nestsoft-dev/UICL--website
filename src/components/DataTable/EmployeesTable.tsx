@@ -134,10 +134,28 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
     }
     const reference = selectedEmployee.referenceCode
     if (!reference) return
-    api
-      .get(`/api/sensitive/${reference}`)
-      .then((response) => setSensitiveData(response.data))
-      .catch(() => setSensitiveData(null))
+
+    let cancelled = false
+    const fetchWithRetry = async (attempts = 2) => {
+      for (let i = 0; i < attempts; i++) {
+        try {
+          const response = await api.get(`/api/submissions/${reference}/sensitive`)
+          if (!cancelled) setSensitiveData(response.data)
+          return
+        } catch (err: any) {
+          const isLast = i === attempts - 1
+          const isReset = err?.code === 'ECONNRESET' || err?.code === 'ERR_NETWORK'
+          if (isLast || !isReset) {
+            if (!cancelled) setSensitiveData(null)
+            return
+          }
+          // short delay before retry
+          await new Promise((r) => setTimeout(r, 1200))
+        }
+      }
+    }
+    fetchWithRetry()
+    return () => { cancelled = true }
   }, [drawerOpen, selectedEmployee, role])
 
   const options = useMemo(() => {
