@@ -10,7 +10,7 @@ import {
 import { useCallback, useEffect, useMemo, useState, type FC } from 'react'
 import { api } from '../../lib/api'
 import type { ClearanceRole } from '../../lib/auth'
-import { exportToCsv } from '../../lib/csv'
+import { exportToPdf } from '../../lib/pdf'
 import EmployeeDrawer, { type SensitiveRecord } from '../Drawer/EmployeeDrawer'
 import { buildColumns, sensitiveColumnIds, type EmployeeRecord } from './columns'
 import Toolbar from './Toolbar'
@@ -30,6 +30,17 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
   role,
   onRefresh,
 }) => {
+  const formatExportHeader = (value: string) =>
+    value
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/\bNok\b/g, 'NOK')
+      .replace(/\bTin\b/g, 'TIN')
+      .replace(/\bNin\b/g, 'NIN')
+      .replace(/\bBvn\b/g, 'BVN')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState({
     siteAndLocation: '',
@@ -172,18 +183,32 @@ const EmployeesTable: FC<EmployeesTableProps> = ({
 
   const handleExport = () => {
     const visibleColumns = table.getVisibleLeafColumns()
-    exportToCsv(
-      `employees_${new Date().toISOString().slice(0, 10)}.csv`,
+    const exportableColumns = visibleColumns
+      .map((col) => {
+        const accessorKey = col.columnDef.accessorKey
+        if (typeof accessorKey !== 'string') return null
+
+        return {
+          header: formatExportHeader(accessorKey),
+          accessor: (row: EmployeeRecord) => row[accessorKey as keyof EmployeeRecord],
+        }
+      })
+      .filter((column): column is NonNullable<typeof column> => Boolean(column))
+
+    if (exportableColumns.length === 0) {
+      return
+    }
+
+    const dateStamp = new Date().toISOString().slice(0, 10)
+    exportToPdf(
+      `employees_${dateStamp}.pdf`,
       filterData,
-      visibleColumns.map((col) => ({
-        header: String(col.columnDef.header ?? ''),
-        accessor: (row) => {
-          const accessorKey = (col as { accessorKey?: keyof EmployeeRecord })
-            .accessorKey
-          if (accessorKey) return row[accessorKey]
-          return ''
-        },
-      })),
+      exportableColumns,
+      {
+        title: `Employee Bio-Data (${dateStamp})`,
+        format: exportableColumns.length > 10 ? 'a3' : 'a4',
+        fontSize: exportableColumns.length > 10 ? 6 : 8,
+      },
     )
   }
 

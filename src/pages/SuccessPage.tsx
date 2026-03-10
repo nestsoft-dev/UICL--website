@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { exportToPdf } from '../lib/pdf'
 
 const STORAGE_KEY = 'bayelsa_biodata_submissions'
 
@@ -32,19 +33,38 @@ export default function SuccessPage() {
 
   const stateName = submission?.data.preferredState || 'Bayelsa'
 
+  const formatLabel = (value: string) =>
+    value
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replaceAll('_', ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+
   const handleExport = () => {
     if (!submission) return
-    const blob = new Blob([JSON.stringify(submission, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${submission.ref}.json`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
+
+    const pdfRows = [
+      { field: 'Reference Code', value: submission.ref },
+      { field: 'Submitted At', value: submission.submittedAt },
+      ...Object.entries(submission.data).map(([key, value]) => ({
+        field: formatLabel(key),
+        value: value ?? '—',
+      })),
+    ]
+
+    exportToPdf(
+      `${submission.ref}.pdf`,
+      pdfRows,
+      [
+        { header: 'Field', accessor: (row) => row.field },
+        { header: 'Value', accessor: (row) => row.value },
+      ],
+      {
+        title: `Submission Details (${submission.ref})`,
+        orientation: 'portrait',
+      },
+    )
   }
 
   return (
@@ -84,7 +104,7 @@ export default function SuccessPage() {
                 disabled={!submission}
                 className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Export JSON
+                Export PDF
               </button>
             </div>
           </div>

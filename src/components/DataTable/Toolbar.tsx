@@ -79,7 +79,7 @@ const Toolbar: FC<ToolbarProps> = ({
               onClick={onExport}
               className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 shadow-sm transition hover:bg-emerald-100"
             >
-              Export CSV
+              Export PDF
             </button>
             <button
               onClick={onRefresh}
